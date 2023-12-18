@@ -1,0 +1,195 @@
+#!/bin/bash
+
+# Fungsi untuk menghitung luas persegi panjang
+hitung_luas_persegi_panjang() {
+  echo "Masukkan panjang persegi panjang: "
+  read panjang
+
+  echo "Masukkan lebar persegi panjang: "
+  read lebar
+
+  # Menghitung luas persegi panjang
+  luas_persegi_panjang=$(echo "$panjang * $lebar" | bc)
+
+  echo "Luas persegi panjang dengan panjang $panjang dan lebar $lebar adalah: $luas_persegi_panjang"
+}
+
+# Fungsi untuk menjalankan FCFS
+jalankan_fcfs() {
+  echo "Jalankan algoritma FCFS (First-Come, First-Served)"
+  echo "Masukkan jumlah proses: "
+  read jumlah_proses
+
+  proses=()
+  waktu_tiba=()
+
+  # Input waktu tiba setiap proses
+  for ((i=1; i<=$jumlah_proses; i++)); do
+    echo "Masukkan waktu tiba untuk proses $i: "
+    read wt
+    proses+=("P$i")
+    waktu_tiba+=($wt)
+  done
+
+  # Urutkan proses berdasarkan waktu tiba
+  for ((i=0; i<$jumlah_proses-1; i++)); do
+    for ((j=0; j<$jumlah_proses-$i-1; j++)); do
+      if [ ${waktu_tiba[$j]} -gt ${waktu_tiba[$(($j+1))]} ]; then
+        # Swap waktu tiba
+        temp=${waktu_tiba[$j]}
+        waktu_tiba[$j]=${waktu_tiba[$(($j+1))]}
+        waktu_tiba[$(($j+1))]=$temp
+
+        # Swap proses
+        temp=${proses[$j]}
+        proses[$j]=${proses[$(($j+1))]}
+        proses[$(($j+1))]=$temp
+      fi
+    done
+  done
+
+  # Tampilkan urutan eksekusi
+  echo "Urutan eksekusi FCFS (First-Come, First-Served):"
+  for ((i=0; i<$jumlah_proses; i++)); do
+    echo "Waktu $((i+1)): Proses ${proses[$i]}"
+  done
+}
+
+while true
+do
+  clear
+  echo "Menu Utama:"
+  echo "1. Membuat Folder Baru"
+  echo "2. Membuat File Baru"
+  echo "3. Manipulasi Hak Akses Berkas"
+  echo "4. Menghitung Luas Persegi Panjang"
+  echo "5. Tampilkan Informasi System"
+  echo "6. Jalankan Program Python"
+  echo "7. Jalankan Algoritma FCFS"
+  echo "8. Keluar Program"
+  read -p "Pilih menu: " pilih
+
+  case $pilih in
+    1)
+      # Kasus membuat folder baru
+      read -p "Masukkan nama folder (biarkan kosong untuk membuat baru): " nama_folder
+
+      if [ -z "$nama_folder" ]; then
+        echo "Masukkan nama folder baru: "
+        read nama_folder
+        sudo mkdir "$nama_folder"
+        echo "Folder $nama_folder berhasil dibuat."
+      else
+        sudo mkdir "$nama_folder"
+        echo "Folder $nama_folder berhasil dibuat."
+      fi
+      ;;
+    2)
+      # Kasus membuat file baru
+      read -p "Masukkan nama file (biarkan kosong untuk membuat baru): " nama_file
+
+      if [ -z "$nama_file" ]; then
+        echo "Masukkan nama file baru: "
+        read nama_file
+        sudo touch "$nama_file"
+        echo "File $nama_file berhasil dibuat."
+      else
+        sudo touch "$nama_file"
+        echo "File $nama_file berhasil dibuat."
+      fi
+      ;;
+    3)
+      # Kasus manipulasi hak akses berkas
+      read -p "Masukkan nama file yang akan di-manipulasi: " nama_file
+
+      if [ -z "$nama_file" ]; then
+        echo "Masukkan nama file baru: "
+        read nama_file
+        sudo touch "$nama_file"
+        echo "File $nama_file berhasil dibuat."
+      else
+        echo "Manipulasi hak akses berkas $nama_file"
+        echo "Masukkan nama pengguna untuk manipulasi hak akses: "
+        read nama_pengguna
+        echo "Hak akses saat ini untuk $nama_file:"
+        ls -l "$nama_file"
+        echo "Pilih jenis hak akses yang ingin Anda berikan untuk $nama_pengguna:"
+        echo "1. (600) – *only (owner = read, write)."
+        echo "2. (644) – (owner = read and write) (user2 & other= only read)."
+        echo "3. (666) – *all (user can read and write)."
+        echo "4. (700) – *only (owner = read, write, execution)."
+        echo "5. (711) – (owner = read, write, execution) (user2 & other = only execution) ."
+        echo "6. (755) – (owner = read, write, execution) (user2 & other = read, execution)."
+        echo "7. (777) - *all (user can read, write, execution)."
+        echo "8. (664) – (owner & user2 = read, write) (other = read)."
+
+        read -p "Masukkan pilihan: " pilih_hak
+
+        case $pilih_hak in
+          1)
+            sudo chmod u+rwx "$nama_file"
+            echo "Hak akses (600) rwx (read, write, execute) telah diberikan kepada pengguna (user) untuk $nama_file"
+            ;;
+          2)
+            sudo chmod 644 "$nama_file"
+            echo "Hak akses (644) rw- r-- r-- (read, write) telah diberikan kepada pengguna (user), grup pengguna, dan others untuk $nama_file"
+            ;;
+          3)
+            sudo chmod 666 "$nama_file"
+            echo "Hak akses (666) rw- rw- rw- (read, write) telah diberikan kepada pengguna (user), grup pengguna, dan others untuk $nama_file"
+            ;;
+          4)
+            sudo chmod 700 "$nama_file"
+            echo "Hak akses (700) rwx --- --- (read, write, execute) telah diberikan kepada pengguna (user) untuk $nama_file"
+            ;;
+          5)
+            sudo chmod 711 "$nama_file"
+            echo "Hak akses (711) rwx --x --x (read, write, execute) telah diberikan kepada pengguna (user), dan execute untuk others untuk $nama_file"
+            ;;
+          6)
+            sudo chmod 755 "$nama_file"
+            echo "Hak akses (755) rwx r-x r-x (read, write, execute) telah diberikan kepada pengguna (user), read, execute untuk grup dan others untuk $nama_file"
+            ;;
+          7)
+            sudo chmod 777 "$nama_file"
+            echo "Hak akses (777) rwx rwx rwx (read, write, execute) telah diberikan kepada pengguna (user), grup pengguna, dan others untuk $nama_file"
+            ;;
+          8)
+            sudo chmod 664 "$nama_file"
+            echo "Hak akses (664) rw- rw- r-- (read, write) telah diberikan kepada pengguna (user) dan grup pengguna, dan read untuk others untuk $nama_file"
+            ;;
+          *)
+            echo "Pilihan tidak valid."
+            ;;
+        esac
+      fi
+      ;;
+    4)
+      # Kasus menghitung luas persegi panjang
+      hitung_luas_persegi_panjang
+      ;;
+    5)
+      # Kode untuk menu 5 (Tampilkan Informasi System)
+      uname -a
+      ;;
+    6)
+      # Kode untuk menu 6 (Jalankan Program Python)
+      echo "Masukkan nama file Python yang akan dijalankan: "
+      read nama_file_python
+      python3 "$nama_file_python"
+      ;;
+    7)
+      # Kasus menjalankan algoritma FCFS
+      jalankan_fcfs
+      ;;
+    8)
+      # Opsi untuk keluar dari program
+      echo "Keluar dari program."
+      exit 0
+      ;;
+    *)
+      echo "Pilihan tidak valid."
+      ;;
+  esac
+  read -p "Tekan Enter untuk melanjutkan..."
+done
